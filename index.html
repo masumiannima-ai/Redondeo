@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aprende a redondear</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f7faff;--grid:#d6e4fa;--ink:#1d3557;--blue:#3a86ff;--pencil:#ffc83d;--ok:#1f9d63;--bad:#e63946;--soft:#e9f1ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{font-family:'Baloo 2','Trebuchet MS',system-ui,sans-serif;color:var(--ink);background-color:var(--paper);
+ background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;
+ padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.screen{max-width:560px;margin:0 auto;padding:18px 16px 28px;min-height:100%;display:flex;flex-direction:column;gap:14px}
+.screen[hidden]{display:none}
+h1{font-size:clamp(1.6rem,7vw,2.2rem);line-height:1.1;margin:8px 0 0;font-weight:800}
+p.hint{margin:0;font-size:1.1rem;font-weight:500}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{font:inherit;font-weight:700;font-size:1.5rem;color:var(--ink);background:#fff;border:3px solid var(--ink);border-radius:16px;padding:10px 8px;cursor:pointer;box-shadow:0 5px 0 var(--ink);display:flex;flex-direction:column;align-items:center;line-height:1.1;transition:transform .08s,box-shadow .08s}
+.opt small{font-size:.85rem;font-weight:500;margin-top:2px}
+.opt:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.opt.wide{grid-column:1/-1;background:var(--pencil)}
+.opt.row{flex-direction:row;justify-content:space-between;text-align:left;gap:8px;font-size:1.2rem}
+.opt.row b{font-size:1.5rem}
+.list{display:flex;flex-direction:column;gap:12px}
+.back{align-self:flex-start;font:inherit;font-weight:700;font-size:1rem;background:none;border:2px solid var(--ink);border-radius:999px;padding:4px 14px;color:var(--ink);cursor:pointer}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dots{display:flex;gap:6px}
+.dots i{width:22px;height:22px;border-radius:50%;border:3px solid var(--ink);background:#fff;transition:background .25s}
+.dots i.on{background:var(--pencil)}
+.task{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:12px 14px;text-align:center}
+.task .q{font-size:1.15rem;font-weight:500}
+.task .q b{color:var(--blue)}
+.num{font-size:clamp(2.1rem,10vw,3.4rem);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.02em;margin-top:2px}
+.slots{display:flex;justify-content:center;gap:6px;margin:10px 0 0;flex-wrap:nowrap}
+.slot{width:min(46px,8.4vw);height:64px;border-bottom:5px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:2.1rem;font-weight:800;cursor:pointer;border-radius:6px 6px 0 0}
+.slot.gap{margin-left:10px}
+.slot.over{background:var(--pencil)}
+.slot.x{color:var(--bad)}
+.slot.v{color:var(--ok)}
+.fix{min-height:2.6rem;text-align:center;font-size:1.3rem;font-weight:700;color:var(--ok)}
+.fix span{font-size:1.7rem;font-variant-numeric:tabular-nums}
+.face{text-align:center;font-size:4.2rem;line-height:1;min-height:4.4rem}
+.face.pop{animation:pop .35s ease-out}
+@keyframes pop{from{transform:scale(.4)}to{transform:scale(1)}}
+.kb{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.key{touch-action:none;user-select:none;-webkit-user-select:none;font:inherit;font-weight:800;font-size:1.9rem;height:58px;background:var(--blue);color:#fff;border:3px solid var(--ink);border-radius:12px;box-shadow:0 4px 0 var(--ink);cursor:grab}
+.go{font:inherit;font-weight:800;font-size:1.4rem;background:var(--ok);color:#fff;border:3px solid var(--ink);border-radius:14px;box-shadow:0 5px 0 var(--ink);padding:10px;cursor:pointer}
+.go:disabled{background:#b9c4d6;cursor:default}
+.acts{display:flex;gap:10px}
+.acts .go{flex:1}
+.acts .clr{flex:0 0 36%;background:var(--pencil);color:var(--ink)}
+.acts .clr:disabled{background:#e3e8f0;color:#8b97ab}
+.ghost{position:fixed;pointer-events:none;z-index:9;width:58px;height:58px;margin:-29px 0 0 -29px;background:var(--pencil);color:var(--ink);border:3px solid var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.9rem}
+.big{text-align:center;margin-top:18vh}
+.big div{font-size:5rem}
+.hint2{text-align:center;font-size:.95rem;font-weight:500;margin:0}
+:focus-visible{outline:4px solid var(--pencil);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.face.pop{animation:none}.opt{transition:none}}
+</style>
+</head>
+<body>
+
+<section class="screen" id="s1">
+ <h1>¿Con cuántas cifras quieres practicar?</h1>
+ <p class="hint">Elige la cifra más alta de tus números.</p>
+ <div class="grid" id="g1"></div>
+</section>
+
+<section class="screen" id="s2" hidden>
+ <button class="back" id="b2">‹ Atrás</button>
+ <h1>¿A qué cifra quieres redondear?</h1>
+ <div class="list" id="g2"></div>
+</section>
+
+<section class="screen" id="s3" hidden>
+ <div class="top">
+  <button class="back" id="b3">‹ Inicio</button>
+  <div class="dots" id="dots" aria-label="Aciertos seguidos"></div>
+ </div>
+ <div class="task">
+  <div class="q" id="q"></div>
+  <div class="num" id="num"></div>
+ </div>
+ <div class="slots" id="slots"></div>
+ <div class="fix" id="fix"></div>
+ <div class="face" id="face"></div>
+ <div class="kb" id="kb"></div>
+ <div class="acts">
+  <button class="go clr" id="clr" disabled>Borrar</button>
+  <button class="go" id="go" disabled>Comprobar</button>
+ </div>
+ <p class="hint2">Arrastra los números a las rayitas (o tócalos). Toca una rayita para borrarla.</p>
+</section>
+
+<section class="screen" id="s4" hidden>
+ <div class="big"><div>🎉</div><h1>¡Muy bien!<br>7 seguidas</h1></div>
+</section>
+
+<script>
+const ORD=['U','D','C','UM','DM','CM','UMM','DMM','CMM'];
+const NAME=['unidades','decenas','centenas','unidades de millar','decenas de millar','centenas de millar','unidades de millón','decenas de millón','centenas de millón'];
+const $=s=>document.querySelector(s);
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const maxPos=n=>Math.max(1,n-2);
+const fmt=x=>{const s=String(x);return s.length<5?s:s.replace(/\B(?=(\d{3})+(?!\d))/g,'\u00A0')};
+let cfg={n:null,p:null},st=null,timer=null;
+
+function show(id){document.querySelectorAll('.screen').forEach(e=>e.hidden=e.id!==id)}
+
+/* Pantalla 1 */
+function home(){
+ clearTimeout(timer);
+ let h='';
+ for(let n=2;n<=9;n++)h+=`<button class="opt" data-n="${n}">${ORD[n-1]}<small>${n} cifras</small></button>`;
+ h+=`<button class="opt wide" data-n="any">CUALQUIERA</button>`;
+ $('#g1').innerHTML=h;
+ show('s1');
+}
+$('#g1').onclick=e=>{const b=e.target.closest('.opt');if(!b)return;cfg.n=b.dataset.n==='any'?'any':+b.dataset.n;options()};
+
+/* Pantalla 2 */
+function options(){
+ const top=cfg.n==='any'?7:maxPos(cfg.n);
+ let h='';
+ for(let p=1;p<=top;p++)h+=`<button class="opt row" data-p="${p}"><span>Redondeo a las<br>${NAME[p]}</span><b>${ORD[p]}</b></button>`;
+ h+=`<button class="opt row" data-p="any" style="background:var(--pencil)"><span>Redondeo a<br>cualquier cifra</span><b>?</b></button>`;
+ $('#g2').innerHTML=h;
+ show('s2');
+}
+$('#g2').onclick=e=>{const b=e.target.closest('.opt');if(!b)return;cfg.p=b.dataset.p==='any'?'any':+b.dataset.p;startRound()};
+$('#b2').onclick=home;
+$('#b3').onclick=home;
+
+/* Generación de ejercicios */
+const isHard=(num,p)=>{const s=10**p;return Math.floor(num/s)%10===9&&num%s>=s/2};
+function gen(hard){
+ for(;;){
+  const p0=cfg.p==='any'?null:cfg.p;
+  const n=cfg.n==='any'?(p0?rnd(p0===1?2:p0+2,9):rnd(2,9)):cfg.n;
+  const p=p0??rnd(1,maxPos(n));
+  const d=Array.from({length:n},(_,i)=>i?rnd(0,9):rnd(1,9));
+  if(hard){d[n-1-p]=9;d[n-p]=rnd(5,9);if(p-1>=0)d[n-p]=rnd(5,9)}
+  const num=+d.join(''),s=10**p;
+  if(hard?!isHard(num,p):(isHard(num,p)||num%s===0))continue;
+  return{num,p,ans:Math.floor((num+s/2)/s)*s,hard};
+ }
+}
+
+/* Ronda */
+function startRound(){
+ st={streak:0,count:0,hardDone:false,hardAt:rnd(2,5),cur:null,retry:null,locked:false,slots:[]};
+ show('s3');
+ const kb=$('#kb');kb.innerHTML=[1,2,3,4,5,6,7,8,9,0].map(d=>`<button class="key" data-d="${d}" aria-label="Número ${d}">${d}</button>`).join('');
+ next();
+}
+function dots(){$('#dots').innerHTML=Array.from({length:7},(_,i)=>`<i class="${i<st.streak?'on':''}"></i>`).join('')}
+function next(){
+ if(st.retry){st.cur=st.retry;st.retry=null}
+ else{st.cur=gen(!st.hardDone&&(st.count>=st.hardAt||st.streak>=5));st.count++}
+ const c=st.cur;
+ st.slots=Array(String(c.ans).length).fill('');st.locked=false;
+ $('#q').innerHTML=`Redondea a las <b>${NAME[c.p]} (${ORD[c.p]})</b>`;
+ $('#num').textContent=fmt(c.num);
+ $('#fix').innerHTML='';$('#face').textContent='';
+ dots();drawSlots();
+}
+function drawSlots(){
+ const L=st.slots.length;
+ $('#slots').innerHTML=st.slots.map((v,i)=>`<div class="slot${L>=5&&i>0&&(L-i)%3===0?' gap':''}" data-i="${i}">${v}</div>`).join('');
+ $('#go').disabled=st.locked||st.slots.some(v=>v==='');
+ $('#clr').disabled=st.locked||st.slots.every(v=>v==='');
+}
+$('#clr').onclick=()=>{if(st.locked)return;st.slots=st.slots.map(()=>'');drawSlots()};
+function put(i,d){if(st.locked)return;st.slots[i]=d;drawSlots()}
+$('#slots').onclick=e=>{const s=e.target.closest('.slot');if(s)put(+s.dataset.i,'')};
+
+/* Arrastrar números */
+let drag=null;
+$('#kb').addEventListener('pointerdown',e=>{
+ const k=e.target.closest('.key');if(!k||!st||st.locked)return;
+ e.preventDefault();drag={d:k.dataset.d,x:e.clientX,y:e.clientY,moved:false,g:null};
+});
+addEventListener('pointermove',e=>{
+ if(!drag)return;
+ if(!drag.moved&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>8){
+  drag.moved=true;drag.g=document.createElement('div');drag.g.className='ghost';drag.g.textContent=drag.d;document.body.appendChild(drag.g);
+ }
+ if(drag.moved){
+  drag.g.style.left=e.clientX+'px';drag.g.style.top=e.clientY+'px';
+  document.querySelectorAll('.slot.over').forEach(s=>s.classList.remove('over'));
+  const t=document.elementFromPoint(e.clientX,e.clientY)?.closest('.slot');if(t)t.classList.add('over');
+ }
+});
+addEventListener('pointerup',e=>{
+ if(!drag)return;
+ const d=drag;drag=null;if(d.g)d.g.remove();
+ if(!d.moved){const i=st.slots.indexOf('');if(i>=0)put(i,d.d);return}
+ const t=document.elementFromPoint(e.clientX,e.clientY)?.closest('.slot');
+ if(t)put(+t.dataset.i,d.d);else drawSlots();
+});
+addEventListener('pointercancel',()=>{if(drag){if(drag.g)drag.g.remove();drag=null;drawSlots()}});
+
+/* Sonidos (Web Audio, sin archivos externos) */
+let AC=null;
+function tone(f,t0,dur,type,vol,f2){
+ const o=AC.createOscillator(),g=AC.createGain();
+ o.type=type;o.frequency.setValueAtTime(f,t0);
+ if(f2)o.frequency.exponentialRampToValueAtTime(f2,t0+dur);
+ g.gain.setValueAtTime(0.0001,t0);
+ g.gain.exponentialRampToValueAtTime(vol,t0+0.02);
+ g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+ o.connect(g);g.connect(AC.destination);o.start(t0);o.stop(t0+dur+0.05);
+}
+function sfx(ok){
+ try{
+  AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  if(AC.state==='suspended')AC.resume();
+  const t=AC.currentTime+0.02;
+  if(ok){ // campanilla ascendente: do-mi-sol-do
+   [523.25,659.25,783.99,1046.5].forEach((f,i)=>{tone(f,t+i*0.11,0.45,'sine',0.28);tone(f*2,t+i*0.11,0.3,'triangle',0.06)});
+  }else{ // zumbido grave y desafinado
+   tone(196,t,0.5,'sawtooth',0.22,110);
+   tone(207,t,0.5,'square',0.12,104);
+  }
+ }catch(e){}
+}
+
+/* Comprobar */
+$('#go').onclick=()=>{
+ if(st.locked)return;
+ st.locked=true;$('#go').disabled=true;
+ const c=st.cur,ok=st.slots.join('')===String(c.ans);
+ const face=$('#face');face.classList.remove('pop');void face.offsetWidth;face.classList.add('pop');
+ const cells=document.querySelectorAll('.slot');
+ if(ok){
+  face.textContent='😊';sfx(true);cells.forEach(s=>s.classList.add('v'));
+  st.streak++;if(c.hard)st.hardDone=true;dots();
+  if(st.streak>=7){timer=setTimeout(()=>{show('s4');timer=setTimeout(home,2800)},1100);return}
+  timer=setTimeout(next,1300);
+ }else{
+  face.textContent='😢';sfx(false);cells.forEach(s=>s.classList.add('x'));
+  $('#fix').innerHTML=`Correcto: <span>${fmt(c.ans)}</span>`;
+  st.streak=Math.max(0,st.streak-1);dots();
+  if(c.hard)st.retry=c;
+  timer=setTimeout(next,3000);
+ }
+};
+
+home();
+</script>
+</body>
+</html>
